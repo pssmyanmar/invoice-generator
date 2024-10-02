@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .invoice-container {
+            border: 1px solid #ccc;
+            width: 600px;
+            padding: 20px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .invoice-header {
+            text-align: center;
+        }
+        .invoice-input {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+        .input-field {
+            padding: 8px;
+            margin-top: 5px;
+        }
+        #qr-code {
+            width: 100px;
+            height: 100px;
+            margin: 10px auto;
+        }
+        button {
+            padding: 10px;
+            cursor: pointer;
+        }
+        canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="invoice-header">Invoice Generator</h1>
+    
+    <div class="invoice-container">
+        <div class="invoice-input">
+            <label for="id">ID</label>
+            <input class="input-field" type="text" id="id" placeholder="Enter ID">
+        </div>
+        <div class="invoice-input">
+            <label for="name">Name</label>
+            <input class="input-field" type="text" id="name" placeholder="Enter Name">
+        </div>
+        <div class="invoice-input">
+            <label for="email">Email</label>
+            <input class="input-field" type="email" id="email" placeholder="Enter Email">
+        </div>
+        <div class="invoice-input">
+            <label for="amount">Amount</label>
+            <input class="input-field" type="number" id="amount" placeholder="Enter Amount">
+        </div>
+
+        <div id="qr-code"></div>
+        <button onclick="generateQRCode()">Generate QR Code</button>
+        <button onclick="downloadInvoice()">Download Invoice</button>
+    </div>
+
+    <canvas id="invoiceCanvas" width="600" height="300"></canvas>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script>
+        function generateQRCode() {
+            const qrCodeContainer = document.getElementById('qr-code');
+            qrCodeContainer.innerHTML = ''; // Clear previous QR code
+            
+            const id = document.getElementById('id').value;
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const amount = document.getElementById('amount').value;
+
+            const qrData = `ID: ${id}, Name: ${name}, Email: ${email}, Amount: ${amount}`;
+
+            // Generate QR code
+            const qr = new QRious({
+                element: qrCodeContainer,
+                size: 100,
+                value: qrData
+            });
+        }
+
+        function downloadInvoice() {
+            const canvas = document.getElementById('invoiceCanvas');
+            const ctx = canvas.getContext('2d');
+
+            const id = document.getElementById('id').value;
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const amount = document.getElementById('amount').value;
+
+            // Set background and text for the invoice
+            ctx.fillStyle = '#f9f9f9';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.font = '20px Arial';
+            ctx.fillStyle = '#333';
+            ctx.fillText(`ID: ${id}`, 20, 40);
+            ctx.fillText(`Name: ${name}`, 20, 80);
+            ctx.fillText(`Email: ${email}`, 20, 120);
+            ctx.fillText(`Amount: ${amount}`, 20, 160);
+
+            // Generate the invoice as an image file
+            const invoiceImage = canvas.toDataURL('image/png');
+            const downloadLink = document.createElement('a');
+            downloadLink.href = invoiceImage;
+            downloadLink.download = 'invoice.png';
+            downloadLink.click();
+        }
+    </script>
+</body>
+</html>
